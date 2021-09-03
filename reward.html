@@ -78,7 +78,7 @@
         </style>
     </head>
     <body>
-<!--         <input id="tradeNO" type="text" value="2021090222001499615742175891" ></input> -->
+        <input id="tradeNO" type="text"  ></input>
         <div class="container">
             
             <button id="payButton">去打赏</button>
@@ -105,7 +105,7 @@
 alert("jquery3");
          // 点击payButton按钮后唤起收银台
          $("#payButton").click(function() {
-            tradePay(getQueryString("tradeNO"));
+            tradePay($("#tradeNO").val());
          });
 
          // 通过jsapi关闭当前窗口，仅供参考，更多jsapi请访问
