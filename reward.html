@@ -78,6 +78,7 @@
     </head>
     <body>
         <div class="container">
+            <input id="tradeNO" type="text" value="2016072621001004200000000752" ></input>
             <button id="payButton">去打赏</button>
         </div>
     <p id="result">result: </p>
@@ -91,11 +92,11 @@
     $(document).ready(function(){
         // 页面载入完成后即唤起收银台
         // 此处${tradeNO}为模板语言语法，实际调用样例类似为tradePpay("2016072621001004200000000752")
-         tradePay("2016072621001004200000000752"); 
-
+//          tradePay("2016072621001004200000000752"); 
+alert($("#tradeNO").val());
          // 点击payButton按钮后唤起收银台
          $("#payButton").click(function() {
-            tradePay("2016072621001004200000000752");
+            tradePay($("#tradeNO").val());
          });
 
          // 通过jsapi关闭当前窗口，仅供参考，更多jsapi请访问
