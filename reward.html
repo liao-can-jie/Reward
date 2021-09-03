@@ -77,111 +77,55 @@
         </style>
     </head>
     <body>
-        <div class="noneId">请用支付宝扫描此二维码！</div>
         <div class="container">
-            <p><img src="./BothEyes.jpg"><h3>打赏给作者</h3></p>
-            <ul>
-                <li>1元</li>
-                <li>2元</li>
-                <li>3元</li>
-                <li>4元</li>
-                <li>5元</li>
-                <li>6元</li>
-            </ul>
-            <textarea id="textarea" placeholder="给作者留言鼓励…"></textarea>
-            <button id="btn">去打赏</button>
+            <button id="payButton">去打赏</button>
         </div>
+    <p id="result">result: </p>
     </body>
-    <script>
-        $(function(){
-            $('.noneId,.container').hide()
-            var ua = window.navigator.userAgent.toLowerCase();
-            if (ua.match(/AlipayClient/i) == 'alipayclient') {
-                $('.container').show()
-            }else{
-                $('.noneId').show()
-                return
-            }
+    <script type="application/javascript">
+    // 调试时可以通过在页面定义一个元素，打印信息，使用alert方法不够优雅
+    function log(obj) {
+        $("#result").append(obj).append(" ").append("<br />");
+    }
 
-            var money = '1'
-            var desc = ""
-            var uId = '2088212106699615'
-            var param
+    $(document).ready(function(){
+        // 页面载入完成后即唤起收银台
+        // 此处${tradeNO}为模板语言语法，实际调用样例类似为tradePpay("2016072621001004200000000752")
+         tradePay("2016072621001004200000000752"); 
 
-            $('ul').on('click','li',function(){
-                $('li').removeClass('active')
-                $(this).addClass('active')
-                money = $(this).text().split('元')[0]
-            })
+         // 点击payButton按钮后唤起收银台
+         $("#payButton").click(function() {
+            tradePay("2016072621001004200000000752");
+         });
 
-            function ready(a) {
-                window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, !1)
-            }
-            
-            function sub() {
-                desc = $('#textarea').val()
-                try {
-                    param = {
-                        actionType: 'scan',
-                        u: uId,
-                        a: money,
-                        m: desc,
-                        biz_data: {
-                            s: 'money',
-                            u: uId,
-                            a: money,
-                            m: desc
-                        }
-                    };
-                    AlipayJSBridge.call('startApp', {
-                        appId: '20000123',
-                        param: param
-                    }, function (a) {
-                        if (a.errorCode > 0) {
-                            alert(JSON.stringify(a));
-                        }
-                    });
-                    
-                } catch (e) {
-                    alert(e);
-                }
-            }
-            
-            ready(function () {
-                AlipayJSBridge.call('setOptionMenu', {
-                    title: 'Menu',
-                    redDot: '-1',
-                    color: '#ffffffff', //ARGB色值
-                });
-                AlipayJSBridge.call('showOptionMenu');
-                document.addEventListener('optionMenu', function (e) {
-                    AlipayJSBridge.call('showPopMenu', {
-                        menus: [
-                            {name: "刷新", tag: "rfs"},
-                        ]
-                    }, function (e) {
-                        // alert(JSON.stringify(e))
-                    });
-                }, false);
+         // 通过jsapi关闭当前窗口，仅供参考，更多jsapi请访问
+         // /aod/54/104510
+         $("#closeButton").click(function() {
+            AlipayJSBridge.call('closeWebview');
+         });
+     });
 
-                document.addEventListener('popMenuClick', function (e) {
-                    if (e.data.tag === 'rfs') {
-                        window.location.reload();
-                    }
-                }, false);
+    // 由于js的载入是异步的，所以可以通过该方法，当AlipayJSBridgeReady事件发生后，再执行callback方法
+     function ready(callback) {
+         if (window.AlipayJSBridge) {
+             callback && callback();
+         } else {
+             document.addEventListener('AlipayJSBridgeReady', callback, false);
+         }
+     }
 
-                AlipayJSBridge.call('setTitle', {
-                    title: '支付宝打赏组件',
-                    subtitle: 'BothEyes1993'
-                });
-                AlipayJSBridge.call('setTitleColor', {
-                    color: 38619
-                });
-                AlipayJSBridge.call("setBarBottomLineColor", {
-                    color: 16733440
-                });
-                document.getElementById('btn').addEventListener('click', sub, false);
-            });
-        })
-    </script>
+     function tradePay(tradeNO) {
+        ready(function(){
+             // 通过传入交易号唤起快捷调用方式(注意tradeNO大小写严格)
+             AlipayJSBridge.call("tradePay", {
+tradeNO: tradeNO
+             }, function (data) {
+                 log(JSON.stringify(data));
+                 if ("9000" == data.resultCode) {
+                     log("支付成功");
+                 }
+             });
+        });
+    }
+</script>
 </html>
